@@ -17,7 +17,7 @@ class StructureProperty
      */
     public function __construct(private Structure $structure)
     {
-        foreach ($structure->decompose() as $property => $value) {
+        foreach ($structure->getStructureVariables() as $property) {
             $reflection = new \ReflectionProperty($structure::class, $property);
             $attributes = $reflection->getAttributes();
 
@@ -40,7 +40,7 @@ class StructureProperty
     {
         $validator = new VariableValidator();
 
-        foreach ($this->structure->decompose() as $property => $value) {
+        foreach ($this->structure->getStructureVariables() as $property) {
             $reflection = new \ReflectionProperty($this->structure::class, $property);
 
             $attributes = array_filter(

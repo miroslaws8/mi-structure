@@ -4,21 +4,15 @@ namespace Structure;
 
 use JetBrains\PhpStorm\Pure;
 use ReflectionException;
-use Structure\Attributes\MapFrom;
-use Structure\Attributes\VariableRules;
 use Structure\Reflections\StructureProperty;
 
 abstract class Structure implements Interfaces\Structure
 {
-    #[MapFrom(name: 'user_id')]
-    #[VariableRules(length: 10, equals: 5)]
-    public int $userId;
-
     /**
      * @throws ReflectionException
      * @throws Exceptions\StructureValidateException
      */
-    public function __construct(public array $properties)
+    public function __construct(public array $properties = [])
     {
         (new StructureProperty($this))->validate();
     }
@@ -26,7 +20,7 @@ abstract class Structure implements Interfaces\Structure
     #[Pure]
     public function __call(string $name, array $arguments): mixed
     {
-        foreach ($this->decompose() as $property => $value) {
+        foreach ($this->getStructureVariables() as $property => $value) {
             if (mb_strpos(strtolower($name), strtolower($property)) !== false) {
                 return $this->{$property};
             }
@@ -37,6 +31,11 @@ abstract class Structure implements Interfaces\Structure
 
     public function decompose(): array
     {
-        return get_class_vars(self::class);
+        return get_object_vars($this);
+    }
+
+    public function getStructureVariables(): array
+    {
+        return array_keys(get_class_vars(self::class));
     }
 }
